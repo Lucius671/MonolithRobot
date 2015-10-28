@@ -45,17 +45,5 @@ namespace TestArduinoTalk
 				return "fail";
 			}
 		}
-
-		public static void Main (string[] args)
-		{
-			Console.WriteLine ("Arduino Talking Starts...");
-			openport ();
-			while (true) 
-			{
-				send (Console.ReadLine ());
-				//Console.WriteLine (read ());
-			}
-			closeport ();
-		}
 	}
 }
