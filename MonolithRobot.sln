@@ -3,6 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonolithRobot", "MonolithRobot\MonolithRobot.csproj", "{1B4D837B-7920-4371-8E7D-6482EBC5A83A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4B8A0988-8F0F-4F9E-A26B-5CB206FD5CC5}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -13,5 +18,7 @@ Global
 		{1B4D837B-7920-4371-8E7D-6482EBC5A83A}.Debug|x86.Build.0 = Debug|x86
 		{1B4D837B-7920-4371-8E7D-6482EBC5A83A}.Release|x86.ActiveCfg = Release|x86
 		{1B4D837B-7920-4371-8E7D-6482EBC5A83A}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
 EndGlobal
