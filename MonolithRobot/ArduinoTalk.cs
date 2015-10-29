@@ -2,9 +2,9 @@ using System;
 using System.Threading;
 using System.IO.Ports;
 
-namespace TestArduinoTalk
+namespace ExternalTalk
 {
-	class MainClass
+	class ExternalDeviceClass
 	{
 		public static SerialPort ExternalDevice = new SerialPort ("/dev/ttyACM0", 9600, Parity.None, 8, StopBits.One);
 
