@@ -33,7 +33,7 @@ namespace MonolithRobot
 			Thread th = new Thread (delegate() {
 				try
 				{
-					Console.WriteLine("Client started");
+					ConsoleAdditives.WriteHeader("Client started");
 					client = new Socket (AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 					client.BeginConnect (remoteEP, new AsyncCallback(connectCallback), client);
 					connectDone.WaitOne ();
@@ -44,6 +44,7 @@ namespace MonolithRobot
 							new AsyncCallback(receiveCallback), state);
 						receiveDone.WaitOne();
 					}
+					ConsoleAdditives.WriteHeader("Client stoped");
 				}
 				catch(Exception ex)
 				{
@@ -58,12 +59,12 @@ namespace MonolithRobot
 				Socket client = (Socket)ar.AsyncState;
 				client.EndConnect (ar);
 
-				Console.WriteLine ("Connected to {0}", client.RemoteEndPoint.ToString ());
+				ConsoleAdditives.WriteInfo ("Connected to {0}", client.RemoteEndPoint.ToString ());
 
 				connectDone.Set ();
 			} catch (Exception ex) {
 				connectDone.Set ();
-				Console.WriteLine (ex.ToString ());
+				ConsoleAdditives.WriteInfo (ex.ToString ());
 			}
 		}
 
@@ -72,7 +73,7 @@ namespace MonolithRobot
 				StateObject state = (StateObject)ar.AsyncState;
 				Socket client = state.workSocket;
 				int bytesRead = client.EndReceive(ar);
-				Console.WriteLine ("Received {0} bytes from {1}", bytesRead, client.RemoteEndPoint.ToString ());
+				ConsoleAdditives.WriteInfo ("Received {0} bytes", bytesRead);
 				if(bytesRead > 0)
 				{
 					state.sb.Append(Encoding.UTF8.GetString(state.buffer, 0, bytesRead));
@@ -80,11 +81,11 @@ namespace MonolithRobot
 					{
 						string toSend = "";
 						string cmd = Between(state.sb.ToString(),"<!S>","<!E>");
-						Console.WriteLine("["+(bytesRead)+"]>"+cmd);
-						toSend = SwitchAnswer(cmd);
+						ConsoleAdditives.WriteInfo("Received {0} bytes as \"{1}\"",bytesRead,cmd);
+						toSend = CommandParser.SwitchAnswer(cmd);
 						if(toSend.Length>0) {
-							Console.WriteLine("<~"+toSend);
 							byte[] bytesToSend = Encoding.UTF8.GetBytes(AddTagsToStr(toSend));
+							ConsoleAdditives.WriteInfo("Sended {0} bytes as \"{1}\"",bytesToSend.Length,toSend);
 							client.BeginSend(bytesToSend, 0, bytesToSend.Length, SocketFlags.None,
 								new AsyncCallback(sendCallback), state);
 						}else{
@@ -111,19 +112,6 @@ namespace MonolithRobot
 			newstate.workSocket = handler;
 			handler.BeginReceive (newstate.buffer, 0, StateObject.BufferSize, 0, 
 				new AsyncCallback (receiveCallback), newstate);
-		}
-
-		private static string SwitchAnswer(string cmd) {
-			string rtn = "";
-			switch (cmd.ToLower ()) {
-			case "ping":
-				rtn = "pong";
-				break;
-			default:
-				rtn = cmd + " accepted";
-				break;
-			}
-			return rtn;
 		}
 
 		static string Between(string str, string str1, string str2)

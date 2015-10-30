@@ -37,6 +37,8 @@
     <Compile Include="TcpClient.cs" />
     <Compile Include="ArduinoTalk.cs" />
     <Compile Include="main.cs" />
+    <Compile Include="ConsoleAdditives.cs" />
+    <Compile Include="CommandParser.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
