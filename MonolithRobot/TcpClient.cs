@@ -81,11 +81,11 @@ namespace MonolithRobot
 					{
 						string toSend = "";
 						string cmd = Between(state.sb.ToString(),"<!S>","<!E>");
-						ConsoleAdditives.WriteInfo("Received {0} bytes as \"{1}\"",bytesRead,cmd);
+						ConsoleAdditives.WriteInfo("Receive {0} bytes as \"{1}\"",bytesRead,cmd);
 						toSend = CommandParser.SwitchAnswer(cmd);
 						if(toSend.Length>0) {
 							byte[] bytesToSend = Encoding.UTF8.GetBytes(AddTagsToStr(toSend));
-							ConsoleAdditives.WriteInfo("Sended {0} bytes as \"{1}\"",bytesToSend.Length,toSend);
+							ConsoleAdditives.WriteInfo("Send {0} bytes as \"{1}\"",bytesToSend.Length,toSend);
 							client.BeginSend(bytesToSend, 0, bytesToSend.Length, SocketFlags.None,
 								new AsyncCallback(sendCallback), state);
 						}else{
@@ -107,7 +107,7 @@ namespace MonolithRobot
 			StateObject state = (StateObject)ar.AsyncState;
 			Socket handler = state.workSocket;
 			int bytesSend = handler.EndSend (ar);
-			Console.WriteLine ("Sended {0} bytes to {1}", bytesSend, client.RemoteEndPoint.ToString ());
+			ConsoleAdditives.WriteInfo ("Sended {0} bytes to {1}", bytesSend, client.RemoteEndPoint.ToString ());
 			StateObject newstate = new StateObject ();
 			newstate.workSocket = handler;
 			handler.BeginReceive (newstate.buffer, 0, StateObject.BufferSize, 0, 
