@@ -22,8 +22,6 @@ namespace MonolithRobot
 
 		private static Socket client = null;
 
-		static bool _isRunning = true;
-
 		public TcpClient (string remoteIp, int port)
 		{
 			remoteEP = new IPEndPoint (IPAddress.Parse (remoteIp), port);
@@ -39,7 +37,7 @@ namespace MonolithRobot
 					client = new Socket (AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 					client.BeginConnect (remoteEP, new AsyncCallback(connectCallback), client);
 					connectDone.WaitOne ();
-					while(_isRunning) {
+					while(client.Connected) {
 						StateObject state = new StateObject();
 						state.workSocket = client;
 						client.BeginReceive (state.buffer, 0, StateObject.BufferSize, 0, 
@@ -64,6 +62,7 @@ namespace MonolithRobot
 
 				connectDone.Set ();
 			} catch (Exception ex) {
+				connectDone.Set ();
 				Console.WriteLine (ex.ToString ());
 			}
 		}
