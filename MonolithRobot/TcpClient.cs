@@ -100,6 +100,7 @@ namespace MonolithRobot
 				}					
 			}catch(Exception ex) {
 				Console.WriteLine (ex.ToString ());
+				receiveDone.Set ();
 			}
 		}
 
