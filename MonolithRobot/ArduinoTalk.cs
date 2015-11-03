@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.IO.Ports;
 
-namespace ExternalTalk
+namespace MonolithRobot
 {
 	class ExternalDeviceClass
 	{
