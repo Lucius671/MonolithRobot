@@ -15,6 +15,18 @@ namespace MonolithRobot
 					return GetInfo (cmdwa);
 				else
 					break;
+                case "arduino_serv1_left":
+                    ExternalDeviceClass.send("arduino_serv1_left");
+                    break;
+                case "arduino_serv1_right":
+                    ExternalDeviceClass.send("arduino_serv1_right");
+                    break;
+                case "arduino_serv2_left":
+                    ExternalDeviceClass.send("arduino_serv2_left");
+                    break;
+                case "arduino_serv2_right":
+                    ExternalDeviceClass.send("arduino_serv2_right");
+                    break;
 			}
 			return "unknow command error";
 		}
