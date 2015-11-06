@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Net;
+using System.Threading;
+using System.IO.Ports;
 
 namespace MonolithRobot
 {
@@ -14,8 +16,7 @@ namespace MonolithRobot
             {
                 Console.WriteLine(i + ":" + ips[i].ToString());
             }
-            ExternalDeviceClass.openport();
-            new TcpClient ("185.48.112.23", 25555);
+            new TcpClient ("192.168.1.50", 25555);
 		}
 	}
 }
