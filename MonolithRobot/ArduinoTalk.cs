@@ -1,49 +1,52 @@
 using System;
 using System.Threading;
 using System.IO.Ports;
+using System.Text;
 
 namespace MonolithRobot
 {
-	class ExternalDeviceClass
+	public class ArduinoDevice
 	{
-		public static SerialPort ExternalDevice = new SerialPort ("/dev/ttyACM0", 9600, Parity.None, 8, StopBits.One);
+		SerialPort arduinoBoard = new SerialPort();
 
-		public static void openport()
-		{
-			Thread.Sleep (2000);
-			ExternalDevice.Open ();
-		}
+        public bool IsOpen {
+            get 
+            {
+                return arduinoBoard.IsOpen;
+            }
+        }
 
-		public static void closeport()
+		public void OpenConnetion()
 		{
-			ExternalDevice.Close ();
-		}
-
-		public static void send(string message)
-		{
-			if (ExternalDevice.IsOpen) 
-			{
-				ExternalDevice.WriteLine (message);
-			}
-			else
-			{
-				Console.WriteLine ("Не могу отправить данные на управляющий микрокомпьютер, порт закрыт.");
+			if (!arduinoBoard.IsOpen) {
+                arduinoBoard.BaudRate = 9600;
+				arduinoBoard.PortName = "/dev/ttyUSB0";
+				arduinoBoard.Open ();
+                ConsoleAdditives.WriteInfo("Arduino port open");
+			} else {
+				throw new InvalidOperationException ("The serial port is already open!");
 			}
 		}
 
-		public static string read()
+		public void Send(string cmd)
 		{
-			if (ExternalDevice.IsOpen) 
-			{
-				string incomingdata;
-				incomingdata = ExternalDevice.ReadLine();
-				return incomingdata;
-			} 
-			else 
-			{
-				Console.WriteLine ("Не могу получить данные с управляющего микрокомпьютера, порт закрыт.");
-				return "fail";
-			}
+            if (arduinoBoard.IsOpen)
+            {
+                ConsoleAdditives.WriteInfo("Sended to A:"+cmd);
+                arduinoBoard.Write(cmd + "\n");
+            }else
+				throw new InvalidOperationException ("The serial port is already open!");
+		}
+
+        public string ReadLn()
+        {
+            return arduinoBoard.ReadLine();
+        }
+
+		public void CloseConnection()
+		{
+			arduinoBoard.Close ();
+            ConsoleAdditives.WriteHeader("Arduino port closed");
 		}
 	}
 }
