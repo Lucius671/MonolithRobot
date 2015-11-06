@@ -20,17 +20,51 @@ namespace MonolithRobot
 		private static ManualResetEvent connectDone = new ManualResetEvent(false);
 		private static ManualResetEvent receiveDone = new ManualResetEvent(false);
 
+        private static Thread th_cli;
+        private static Thread th_dev;
+
 		private static Socket client = null;
+        private static ArduinoDevice device = null;
 
 		public TcpClient (string remoteIp, int port)
 		{
 			remoteEP = new IPEndPoint (IPAddress.Parse (remoteIp), port);
 			StartClient ();
+            StartArduino ();
 		}
+
+        private static void StartArduino()
+        {
+            th_dev = new Thread(delegate() {
+                try {
+                    ConsoleAdditives.WriteHeader("Arduino started");
+                    device = new ArduinoDevice();
+                    device.OpenConnetion();
+                    StringBuilder sb = new StringBuilder();
+                    while(device.IsOpen){
+                        if(!th_cli.IsAlive)
+                            break;
+                        sb.Append(device.ReadLn());
+                        if(sb.ToString().Contains("<!E>"))
+                        {
+                            string cmd = Between(sb.ToString(),"<!S>","<!E>");
+                            client.Send(Encoding.UTF8.GetBytes(AddTagsToStr("Arduino:"+cmd)));
+                            ConsoleAdditives.WriteInfo("ReceivedFA:"+cmd);
+                            sb.Clear();
+                        }
+                    }
+                    device.CloseConnection();
+                    ConsoleAdditives.WriteHeader("Arduino stoped");
+                }catch(Exception ex){
+                    Console.WriteLine(ex.ToString());
+                }
+            });
+            th_dev.Start();
+        }
 
 		private static void StartClient()
 		{
-			Thread th = new Thread (delegate() {
+			th_cli = new Thread (delegate() {
 				try
 				{
 					ConsoleAdditives.WriteHeader("Client started");
@@ -50,8 +84,9 @@ namespace MonolithRobot
 				{
 					Console.WriteLine(ex.ToString());
 				}
+    
 			});
-			th.Start ();
+			th_cli.Start ();
 		}
 
 		private static void connectCallback(IAsyncResult ar) {
@@ -64,7 +99,7 @@ namespace MonolithRobot
 				connectDone.Set ();
 			} catch (Exception ex) {
 				connectDone.Set ();
-				ConsoleAdditives.WriteInfo (ex.ToString ());
+				ConsoleAdditives.WriteInfo ("Client:"+ex.ToString ());
 			}
 		}
 
@@ -82,7 +117,7 @@ namespace MonolithRobot
 						string toSend = "";
 						string cmd = Between(state.sb.ToString(),"<!S>","<!E>");
 						ConsoleAdditives.WriteInfo("Receive {0} bytes as \"{1}\"",bytesRead,cmd);
-						toSend = CommandParser.SwitchAnswer(cmd);
+						toSend = SwitchAnswer(cmd);
 						if(toSend.Length>0) {
 							byte[] bytesToSend = Encoding.UTF8.GetBytes(AddTagsToStr(toSend));
 							ConsoleAdditives.WriteInfo("Send {0} bytes as \"{1}\"",bytesToSend.Length,toSend);
@@ -119,7 +154,7 @@ namespace MonolithRobot
 		{
 			int i1 = 0, i2 = 0;
 			string rtn = "";
-			i1 = str.IndexOf (str1, StringComparison.InvariantCultureIgnoreCase);
+            i1 = str.LastIndexOf (str1, StringComparison.InvariantCultureIgnoreCase);
 			if (i1 > -1) {
 				i2 = str.IndexOf (str2, i1 + 1, StringComparison.CurrentCultureIgnoreCase);
 				if (i2 > -1) {
@@ -133,5 +168,50 @@ namespace MonolithRobot
 		{
 			return "<!S>" + str + "<!E>";
 		}
+
+        public static string SwitchAnswer(string cmd)
+        {
+            string[] cmdwa = cmd.Split (' ');
+            switch (cmdwa [0].ToLower ()) {
+                case "ping":
+                    return "pong";
+                case "getinfo":
+                    if (cmdwa.Length > 1)
+                        return GetInfo (cmdwa);
+                    else
+                        break;
+                case "arduino":
+                    if (cmdwa.Length > 1)
+                    {
+                        ArduinoCmd(cmdwa);
+                        return "ok_arduino";
+                    }
+                    else
+                        return "unknow argument of arduino function";
+            }
+            return "unknow command error";
+        }
+
+        public static string ArduinoCmd(string[] cmdwa)
+        {
+            try {
+                string s = "";
+                for(int i=1;i<cmdwa.Length;i++)
+                    s += cmdwa[i];
+                device.Send(s);
+            }catch(Exception ex){
+                Console.WriteLine(ex.ToString());
+            }
+            return "";
+        }
+
+        public static string GetInfo(string[] cmdwa)
+        {
+            switch (cmdwa [1].ToLower ()) {
+                case "os":
+                    return Environment.OSVersion.ToString();
+            }
+            return "unknow argument of getinfo function";
+        }
 	}
 }
