@@ -30,12 +30,8 @@ namespace MonolithRobot
 
 		public void Send(string cmd)
 		{
-            if (arduinoBoard.IsOpen)
-            {
-                ConsoleAdditives.WriteInfo("Sended to A:"+cmd);
-                arduinoBoard.Write(cmd + "\n");
-            }else
-				throw new InvalidOperationException ("The serial port is already open!");
+            ConsoleAdditives.WriteInfo("Sended to A:"+cmd);
+            arduinoBoard.Write(cmd + '#');
 		}
 
         public string ReadLn()
