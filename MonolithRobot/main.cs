@@ -10,6 +10,7 @@ namespace MonolithRobot
 	{
 
         public static string ip = "192.168.1.50";
+        public static string abPort = "/dev/ttyUSB0";
 
 		public static void Main (string[] args)
 		{
@@ -35,6 +36,11 @@ namespace MonolithRobot
                 {
                     ip = strs[i].Split('=')[1];
                     ConsoleAdditives.WriteHeader("Now ip is:" + ip);
+                }
+                if (strs[i].Split('=')[0] == "abPort")
+                {
+                    abPort = strs[i].Split('=')[1];
+                    ConsoleAdditives.WriteHeader("Now arduino port is:" + abPort);
                 }
             }
         }
