@@ -16,7 +16,10 @@ namespace MonolithRobot
             {
                 Console.WriteLine(i + ":" + ips[i].ToString());
             }
+            try {
             new TcpClient ("192.168.1.50", 25555);
+            }catch{
+            }
 		}
 	}
 }
