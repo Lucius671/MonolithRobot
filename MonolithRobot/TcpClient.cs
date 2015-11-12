@@ -24,7 +24,10 @@ namespace MonolithRobot
         private static Thread th_dev;
 
 		private static Socket client = null;
+        private static CamClient camStream = null;
         private static ArduinoDevice device = null;
+
+
 
 		public TcpClient (string remoteIp, int port)
 		{
@@ -58,6 +61,7 @@ namespace MonolithRobot
                 }catch(Exception ex){
                     Console.WriteLine(ex.ToString());
                 }
+                th_cli.Abort();
             });
             th_dev.Start();
         }
@@ -84,9 +88,9 @@ namespace MonolithRobot
 				{
 					Console.WriteLine(ex.ToString());
 				}
-    
+                throw new Exception("Server disconnection");
 			});
-			th_cli.Start ();
+            th_cli.Start();
 		}
 
 		private static void connectCallback(IAsyncResult ar) {
@@ -180,11 +184,16 @@ namespace MonolithRobot
                         return GetInfo (cmdwa);
                     else
                         break;
+                case "cam":
+                    if (cmdwa.Length > 1)
+                        return CamCmd (cmdwa);
+                    else
+                        break;
                 case "arduino":
                     if (cmdwa.Length > 1)
                     {
                         ArduinoCmd(cmdwa);
-                        return "ok_arduino";
+                        return "cmd "+device.IsOpen.ToString();
                     }
                     else
                         return "unknow argument of arduino function";
@@ -192,17 +201,12 @@ namespace MonolithRobot
             return "unknow command error";
         }
 
-        public static string ArduinoCmd(string[] cmdwa)
+        public static void ArduinoCmd(string[] cmdwa)
         {
-            try {
                 string s = "";
                 for(int i=1;i<cmdwa.Length;i++)
                     s += cmdwa[i];
                 device.Send(s);
-            }catch(Exception ex){
-                Console.WriteLine(ex.ToString());
-            }
-            return "";
         }
 
         public static string GetInfo(string[] cmdwa)
@@ -210,6 +214,22 @@ namespace MonolithRobot
             switch (cmdwa [1].ToLower ()) {
                 case "os":
                     return Environment.OSVersion.ToString();
+            }
+            return "unknow argument of getinfo function";
+        }
+
+        public static string CamCmd(string[] cmdwa)
+        {
+            switch (cmdwa[1].ToLower())
+            {
+                case "on":
+                    if (camStream != null)
+                        return "stream is already started";
+                    else
+                    {
+                        camStream = new CamClient(remoteEP.Address);
+                        return "stream started";
+                    }
             }
             return "unknow argument of getinfo function";
         }
