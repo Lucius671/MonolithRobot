@@ -34,7 +34,7 @@ namespace MonolithRobot
                 if (strs[i].Split('=')[0] == "ip")
                 {
                     ip = strs[i].Split('=')[1];
-                    Console.WriteLine("Now ip is:" + ip);
+                    ConsoleAdditives.WriteHeader("Now ip is:" + ip);
                 }
             }
         }
