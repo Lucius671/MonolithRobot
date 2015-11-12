@@ -20,7 +20,7 @@ namespace MonolithRobot
 		{
 			if (!arduinoBoard.IsOpen) {
                 arduinoBoard.BaudRate = 9600;
-				arduinoBoard.PortName = "/dev/ttyUSB0";
+				arduinoBoard.PortName = MainClass.abPort;
 				arduinoBoard.Open ();
                 ConsoleAdditives.WriteInfo("Arduino port open");
 			} else {
